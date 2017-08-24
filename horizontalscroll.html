@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        * {
+            padding: 0;
+            margin: 0;
+        }
+
+        .container {
+            position: absolute;
+            width: 100%;
+        }
+
+        .camera {
+            height: 100px;
+            width: 550px;
+            overflow: hidden;
+            position: absolute;
+        }
+
+        .photo {
+            position: absolute;
+            height: 100px;
+            float: left;
+        }
+
+        img {
+            box-sizing: border-box;
+            display: block;
+            float: left;
+            position: relative;
+            height: 100px;
+            width: 100px;
+            margin-right: 10px;
+            background-size: 100px 100px;
+        }
+
+        img:hover {
+            box-sizing: border-box;
+            display: block;
+            float: left;
+            height: 100px;
+            width: 100px;
+            margin-right: 10px;
+            background-size: 100px 100px;
+            border-style: ridge;
+            border-color: blue;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="camera">
+        <div id="first" class="photo">
+        </div>
+        <div id="second" class="photo">
+        </div>
+    </div>
+
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script>
+    var center = true;
+    var distance;
+    document.getElementsByClassName('camera')[0].style.width = '550px';
+    var a = document.getElementById('first'), b = document.getElementById('second');
+    a.style.top = '0';
+    b.style.top = '0';
+    a.style.left = '0';
+    $(document).ready(function () {
+        $.ajax({
+            url: "need.json", success: function (e) {
+                distance = e.data.length * 110 + 'px';
+                a.style.width = distance;
+                b.style.width = distance;
+                $.each(e.data, function () {
+                    var img1 = document.createElement('img');
+                    $(img1).attr("src", this.img);
+                    a.appendChild(img1);
+                });
+                $.each(e.data, function () {
+                    var img2 = document.createElement('img');
+                    $(img2).attr("src", this.img);
+                    b.appendChild(img2);
+                });
+                b.style.left = e.data.length * 110 + 'px';
+            }, dataType: "json"
+        });
+    });
+    function scroll() {
+        if (center) {
+            a.style.left = parseFloat(a.style.left) - 1 + 'px';
+            b.style.left = parseFloat(b.style.left) - 1 + 'px';
+            if (parseFloat(a.style.left) <= -parseFloat(distance)) {
+                a.style.left = distance
+            }
+            if (parseFloat(b.style.left) <= -parseFloat(distance)) {
+                b.style.left = distance
+            }
+        }
+        requestAnimationFrame(scroll)
+    }
+    scroll();
+    $(function () {
+        $(document).on("mouseenter", "img", function () {
+            center = false;
+        });
+        $(document).on("mouseout", "img", function () {
+            center = true;
+        });
+    })
+</script>
+</html>
